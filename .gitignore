@@ -4,11 +4,16 @@
 # Xcode user state
 xcuserdata/
 *.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Swift Package Manager local state
+.swiftpm/
+.build/
 
 # Build products
 DerivedData/
 build/
-.build/
 *.xcarchive
 *.ipa
 *.dSYM/
