@@ -8,58 +8,72 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var viewModel = TunerViewModel()
+	@StateObject private var view_model = TunerViewModel()
 
-    var body: some View {
-        ZStack {
-            Color.white.ignoresSafeArea()
+	var body: some View {
+		ZStack {
+			Color.white.ignoresSafeArea()
+			tuner_content
+		}
+		.onAppear {
+			view_model.start()
+		}
+		.onDisappear {
+			view_model.stop()
+		}
+	}
 
-            VStack {
-                Spacer()
+	private var tuner_content: some View {
+		VStack {
+			Spacer()
 
-                TunerDialView(cents: viewModel.pitchInfo.cents)
+			TunerDialView(cents: view_model.pitch_info.cents)
 
-                NoteStripView(pitchInfo: viewModel.pitchInfo)
-                    .frame(height: 150)
-                    .padding(.top, 8)
+			NoteStripView(pitch_info: view_model.pitch_info)
+				.frame(height: 150)
+				.padding(.top, 8)
 
-                VStack(spacing: 24) {
-                    HStack(spacing: 12) {
-                        Text("current_value")
-                        Text(
-                            viewModel.pitchInfo.isValid
-                            ? String(format: "%.2f", viewModel.pitchInfo.frequency)
-                            : "--"
-                        )
-                        Text("hz")
-                    }
+			frequency_readings
 
-                    HStack(spacing: 12) {
-                        Text("standard_value")
-                        Text(
-                            viewModel.pitchInfo.isValid
-                            ? String(format: "%.2f", viewModel.pitchInfo.targetFrequency)
-                            : "--"
-                        )
-                        Text("hz")
-                    }
-                }
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(Color(red: 0.14, green: 0.22, blue: 0.30))
-                .padding(.top, 12)
+			Spacer()
+		}
+	}
 
-                Spacer()
-            }
-        }
-        .onAppear {
-            viewModel.start()
-        }
-        .onDisappear {
-            viewModel.stop()
-        }
-    }
+	private var frequency_readings: some View {
+		VStack(spacing: 24) {
+			frequency_row(
+				"current_value",
+				frequency: view_model.pitch_info.frequency
+			)
+			frequency_row(
+				"standard_value",
+				frequency: view_model.pitch_info
+					.target_frequency
+			)
+		}
+		.font(.system(size: 20, weight: .semibold))
+		.foregroundStyle(Color(red: 0.14, green: 0.22, blue: 0.30))
+		.padding(.top, 12)
+	}
+
+	private func frequency_row(
+		_ label: LocalizedStringKey,
+		frequency: Float
+	) -> some View
+	{
+		let value =
+			view_model.pitch_info.is_valid
+			? String(format: "%.2f", frequency)
+			: "--"
+
+		return HStack(spacing: 12) {
+			Text(label)
+			Text(value)
+			Text("hz")
+		}
+	}
 }
 
 #Preview {
-    ContentView()
+	ContentView()
 }

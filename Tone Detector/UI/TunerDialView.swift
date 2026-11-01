@@ -8,53 +8,62 @@
 import SwiftUI
 
 struct TunerDialView: View {
-    let cents: Float
+	let cents: Float
 
-    private var clampedCents: Float {
-        min(max(cents, -50), 50)
-    }
+	private var clamped_cents: Float {
+		min(max(cents, -50), 50)
+	}
 
-    private var needleAngle: Double {
-        Double(clampedCents / 50) * 45
-    }
+	private var needle_angle: Double {
+		Double(clamped_cents / 50) * 45
+	}
 
-    var body: some View {
-        ZStack {
-            ForEach(-5...5, id: \.self) { index in
-                TickView(isMajor: index == 0 || index == -4 || index == 4)
-                    .rotationEffect(.degrees(Double(index) * 9))
-            }
+	var body: some View {
+		ZStack {
+			ForEach(-5...5, id: \.self) { index in
+				TickView(
+					is_major: index == 0 || index == -4
+						|| index == 4
+				)
+				.rotationEffect(.degrees(Double(index) * 9))
+			}
 
-            NeedleView()
-                .rotationEffect(.degrees(needleAngle))
-                .animation(.easeOut(duration: 0.12), value: needleAngle)
-        }
-        .frame(width: 360, height: 260)
-    }
+			NeedleView()
+				.rotationEffect(.degrees(needle_angle))
+				.animation(
+					.easeOut(duration: 0.12),
+					value: needle_angle
+				)
+		}
+		.frame(width: 360, height: 260)
+	}
 }
 
 struct TickView: View {
-    let isMajor: Bool
+	let is_major: Bool
 
-    var body: some View {
-        Rectangle()
-            .fill(Color(red: 0.14, green: 0.22, blue: 0.30))
-            .frame(width: isMajor ? 3 : 2, height: isMajor ? 28 : 14)
-            .offset(y: -120)
-    }
+	var body: some View {
+		Rectangle()
+			.fill(Color(red: 0.14, green: 0.22, blue: 0.30))
+			.frame(
+				width: is_major ? 3 : 2,
+				height: is_major ? 28 : 14
+			)
+			.offset(y: -120)
+	}
 }
 
 struct NeedleView: View {
-    var body: some View {
-        ZStack {
-            Rectangle()
-                .fill(Color(red: 0.14, green: 0.22, blue: 0.30))
-                .frame(width: 3, height: 165)
-                .offset(y: -82)
+	var body: some View {
+		ZStack {
+			Rectangle()
+				.fill(Color(red: 0.14, green: 0.22, blue: 0.30))
+				.frame(width: 3, height: 165)
+				.offset(y: -82)
 
-            Circle()
-                .fill(Color(red: 0.14, green: 0.22, blue: 0.30))
-                .frame(width: 14, height: 14)
-        }
-    }
+			Circle()
+				.fill(Color(red: 0.14, green: 0.22, blue: 0.30))
+				.frame(width: 14, height: 14)
+		}
+	}
 }

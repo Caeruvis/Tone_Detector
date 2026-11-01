@@ -5,62 +5,75 @@
 //  Created by 杨哲仁 on 5/23/26.
 //
 
-import Foundation
 import AudioKit
-import SoundpipeAudioKit
 import AVFoundation
+import Foundation
+import SoundpipeAudioKit
 
 final class AudioManager {
-    private let engine = AudioEngine()
-    private var pitchTap: PitchTap?
+	private let engine = AudioEngine()
+	private var pitch_tap: PitchTap?
 
-    private var smoothedFrequency: Float = 0
+	private var smoothed_frequency: Float = 0
 
-    var onPitchDetected: ((Float) -> Void)?
+	var on_pitch_detected: ((Float) -> Void)?
 
-    func start() throws {
-        guard let input = engine.input else {
-            return
-        }
+	func start() throws
+	{
+		guard let input = engine.input else {
+			return
+		}
 
-        engine.output = Mixer(input)
+		engine.output = Mixer(input)
 
-        pitchTap = PitchTap(input) { [weak self] pitches, amplitudes in
-            guard let self else { return }
+		pitch_tap = PitchTap(input) { [weak self] pitches, amplitudes in
+			guard let self else {
+				return
+			}
 
-            guard let pitch = pitches.first else { return }
-            guard let amplitude = amplitudes.first else { return }
+			guard let pitch = pitches.first else {
+				return
+			}
+			guard let amplitude = amplitudes.first else {
+				return
+			}
 
-            let frequency = Float(pitch)
-            let amp = Float(amplitude)
+			self.update_frequency(
+				Float(pitch),
+				amplitude: Float(amplitude)
+			)
+		}
 
-            guard amp > 0.08 else {
-                return
-            }
+		try engine.start()
+		pitch_tap?.start()
+	}
 
-            guard frequency >= 20, frequency <= 200000 else {
-                return
-            }
+	func stop()
+	{
+		pitch_tap?.stop()
+		engine.stop()
+		smoothed_frequency = 0
+	}
 
-            if self.smoothedFrequency == 0 {
-                self.smoothedFrequency = frequency
-            } else {
-                self.smoothedFrequency =
-                    self.smoothedFrequency * 0.82 + frequency * 0.18
-            }
+	private func update_frequency(_ frequency: Float, amplitude: Float)
+	{
+		guard amplitude > 0.08 else {
+			return
+		}
 
-            DispatchQueue.main.async {
-                self.onPitchDetected?(self.smoothedFrequency)
-            }
-        }
+		guard frequency >= 20, frequency <= 200000 else {
+			return
+		}
 
-        try engine.start()
-        pitchTap?.start()
-    }
+		if smoothed_frequency == 0 {
+			smoothed_frequency = frequency
+		} else {
+			smoothed_frequency =
+				smoothed_frequency * 0.82 + frequency * 0.18
+		}
 
-    func stop() {
-        pitchTap?.stop()
-        engine.stop()
-        smoothedFrequency = 0
-    }
+		DispatchQueue.main.async {
+			self.on_pitch_detected?(self.smoothed_frequency)
+		}
+	}
 }

@@ -8,21 +8,21 @@
 import Foundation
 
 struct PitchInfo {
-    let frequency: Float
-    let targetFrequency: Float
-    let noteName: String
-    let octave: Int
-    let cents: Float
-    let midi: Int
-    let isValid: Bool
+	let frequency: Float
+	let target_frequency: Float
+	let note_name: String
+	let octave: Int
+	let cents: Float
+	let midi: Int
+	let is_valid: Bool
 
-    static let empty = PitchInfo(
-        frequency: 0,
-        targetFrequency: 0,
-        noteName: "--",
-        octave: 0,
-        cents: 0,
-        midi: 0,
-        isValid: false
-    )
+	static let empty = PitchInfo(
+		frequency: 0,
+		target_frequency: 0,
+		note_name: "--",
+		octave: 0,
+		cents: 0,
+		midi: 0,
+		is_valid: false
+	)
 }

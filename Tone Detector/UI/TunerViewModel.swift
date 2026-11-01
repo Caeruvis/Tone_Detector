@@ -5,39 +5,39 @@
 //  Created by 杨哲仁 on 5/23/26.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 @MainActor
 final class TunerViewModel: ObservableObject {
+	@Published var pitch_info: PitchInfo = .empty
 
-    @Published var pitchInfo: PitchInfo = .empty
+	private let audio_manager = AudioManager()
 
-    private let audioManager = AudioManager()
+	init()
+	{
+		audio_manager.on_pitch_detected = { [weak self] frequency in
+			guard let self else {
+				return
+			}
 
-    init() {
+			self.pitch_info = PitchMath.make_pitch_info(
+				frequency: frequency
+			)
+		}
+	}
 
-        audioManager.onPitchDetected = { [weak self] frequency in
+	func start()
+	{
+		do {
+			try audio_manager.start()
+		} catch {
+			print(error)
+		}
+	}
 
-            guard let self else { return }
-
-            self.pitchInfo =
-                PitchMath.makePitchInfo(
-                    frequency: frequency
-                )
-        }
-    }
-
-    func start() {
-
-        do {
-            try audioManager.start()
-        } catch {
-            print(error)
-        }
-    }
-
-    func stop() {
-        audioManager.stop()
-    }
+	func stop()
+	{
+		audio_manager.stop()
+	}
 }
